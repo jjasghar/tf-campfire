@@ -70,7 +70,8 @@ update: ## Update Campfire application
 
 test-deploy: ## Deploy in test mode with random domain hash
 	@echo "Deploying in test mode..."
-	@cp terraform.test.tfvars.example terraform.tfvars
+	@cp terraform.tfvars.example terraform.tfvars
+	@echo "⚠️  Please edit terraform.tfvars and set production = false for test mode"
 	@terraform apply -auto-approve
 	@echo "Test deployment complete!"
 	@echo "Test URL: $$(terraform output -raw campfire_url)"
@@ -89,3 +90,14 @@ prod-deploy: ## Deploy in production mode with clean domain
 prod-destroy: ## Destroy production deployment
 	@echo "Destroying production deployment..."
 	@terraform destroy -auto-approve
+
+# Configuration targets
+config-ibm: ## Copy IBM Cloud example configuration
+	@echo "📋 Copying IBM Cloud example configuration..."
+	@cp terraform.tfvars.example terraform.tfvars
+	@echo "✅ Configuration copied. Edit terraform.tfvars and set cloud_provider = \"ibm\""
+
+config-do: ## Copy DigitalOcean example configuration
+	@echo "📋 Copying DigitalOcean example configuration..."
+	@cp terraform.tfvars.example terraform.tfvars
+	@echo "✅ Configuration copied. Edit terraform.tfvars and set cloud_provider = \"digitalocean\""

@@ -2,7 +2,7 @@
 
 echo "🐳 Building Campfire Docker image..."
 cd /opt/campfire
-docker build -t campfire:latest https://github.com/basecamp/once-campfire.git
+docker build -t campfire:latest https://github.com/basecamp/once-campfire.git#main
 
 echo "📝 Creating Caddyfile..."
 cat > /opt/campfire/Caddyfile << EOF
@@ -37,6 +37,12 @@ EOF
 
 echo "🚀 Starting Campfire application with Caddy..."
 docker-compose up -d
+
+echo "⏳ Waiting for Campfire application to be ready..."
+sleep 30
+
+echo "🔄 Restarting Caddy to ensure proper connection..."
+docker-compose restart caddy
 
 echo "📋 Creating systemd service..."
 cat > /etc/systemd/system/campfire.service << 'EOF'

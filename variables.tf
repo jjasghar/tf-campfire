@@ -1,7 +1,18 @@
+variable "cloud_provider" {
+  description = "Cloud provider to use (ibm or digitalocean)"
+  type        = string
+  default     = "ibm"
+  validation {
+    condition     = contains(["ibm", "digitalocean"], var.cloud_provider)
+    error_message = "Cloud provider must be either 'ibm' or 'digitalocean'."
+  }
+}
+
 variable "ibm_api_key" {
   description = "IBM Cloud API key"
   type        = string
   sensitive   = true
+  default     = null
 }
 
 variable "ibm_region" {
@@ -65,6 +76,33 @@ variable "ssh_private_key_path" {
 variable "resource_group_id" {
   description = "IBM Cloud resource group ID"
   type        = string
+  default     = null
+}
+
+# DigitalOcean Variables
+variable "digitalocean_token" {
+  description = "DigitalOcean API token"
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "digitalocean_region" {
+  description = "DigitalOcean region"
+  type        = string
+  default     = "nyc3"
+}
+
+variable "digitalocean_size" {
+  description = "DigitalOcean droplet size"
+  type        = string
+  default     = "s-2vcpu-4gb"
+}
+
+variable "digitalocean_ssh_key_id" {
+  description = "DigitalOcean SSH key ID (alternative to ssh_public_key)"
+  type        = string
+  default     = null
 }
 
 variable "instance_image" {
