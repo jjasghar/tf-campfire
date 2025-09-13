@@ -17,6 +17,11 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.1"
     }
+
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5"
+    }
   }
 }
 
@@ -35,6 +40,10 @@ provider "digitalocean" {
 provider "dnsimple" {
   token   = var.dnsimple_token
   account = var.dnsimple_account
+}
+
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
 }
 
 # Generate random password for database
@@ -162,7 +171,9 @@ resource "ibm_is_ssh_key" "campfire_key" {
 
 # Local value for SSH key ID
 locals {
-  ssh_key_id = var.ibm_ssh_key_id != null ? var.ibm_ssh_key_id : ibm_is_ssh_key.campfire_key[0].id
+  ssh_key_id = var.ibm_ssh_key_id != null ? var.ibm_ssh_key_id : (
+    length(ibm_is_ssh_key.campfire_key) > 0 ? ibm_is_ssh_key.campfire_key[0].id : null
+  )
 }
 
 # Create floating IP
@@ -207,7 +218,7 @@ resource "digitalocean_ssh_key" "campfire_key" {
 resource "digitalocean_droplet" "campfire_droplet" {
   count    = var.cloud_provider == "digitalocean" ? 1 : 0
   name     = "${var.project_name}-droplet"
-  image    = "ubuntu-22-04-x64"
+  image    = "ubuntu-24-04-x64"
   region   = var.digitalocean_region
   size     = var.digitalocean_size
   ssh_keys = var.digitalocean_ssh_key_id != null ? [var.digitalocean_ssh_key_id] : (var.ssh_public_key != null ? [digitalocean_ssh_key.campfire_key[0].id] : [])
@@ -346,9 +357,20 @@ resource "null_resource" "campfire_setup_do" {
 
 # Create DNSimple DNS record
 resource "dnsimple_zone_record" "campfire_dns" {
+  count     = var.dns_provider == "dnsimple" ? 1 : 0
   zone_name = var.domain_name
   name      = var.production ? var.subdomain : "${var.subdomain}${local.hash_suffix}"
   value     = var.cloud_provider == "ibm" ? ibm_is_floating_ip.campfire_fip[0].address : digitalocean_droplet.campfire_droplet[0].ipv4_address
   type      = "A"
   ttl       = 300
+}
+
+resource "cloudflare_dns_record" "campfire_dns" {
+  count    = var.dns_provider == "cloudflare" ? 1 : 0
+  zone_id  = var.cloudflare_zone_id
+  name     = var.production ? var.subdomain : "${var.subdomain}${local.hash_suffix}"
+  content  = var.cloud_provider == "ibm" ? ibm_is_floating_ip.campfire_fip[0].address : digitalocean_droplet.campfire_droplet[0].ipv4_address
+  type     = "A"
+  ttl      = 300
+  proxied  = false
 }

@@ -8,6 +8,16 @@ variable "cloud_provider" {
   }
 }
 
+variable "dns_provider" {
+  description = "DNS provider to use (dnsimple or cloudflare)"
+  type        = string
+  default     = "dnsimple"
+  validation {
+    condition     = contains(["dnsimple", "cloudflare"], var.dns_provider)
+    error_message = "DNS provider must be either 'dnsimple' or 'cloudflare'."
+  }
+}
+
 variable "ibm_api_key" {
   description = "IBM Cloud API key"
   type        = string
@@ -48,12 +58,28 @@ variable "dnsimple_token" {
   description = "DNSimple API token"
   type        = string
   sensitive   = true
+  default     = null
 }
 
 variable "dnsimple_account" {
   description = "DNSimple account ID"
   type        = string
+  default     = null
 }
+
+variable "cloudflare_api_token" {
+  description = "Cloudflare API token"
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+variable "cloudflare_zone_id" {
+  description = "Cloudflare domain zone ID"
+  type        = string
+  default     = null
+}
+
 
 variable "ibm_ssh_key_id" {
   description = "IBM Cloud SSH key ID (alternative to ssh_public_key)"
