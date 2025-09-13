@@ -18,7 +18,8 @@ cloud_provider = "ibm"  # Change to "digitalocean" for DigitalOcean deployment
 # =============================================================================
 # PROJECT CONFIGURATION
 # =============================================================================
-# Basic project settings (used by both providers)
+# Only used when dns_provider = "dnsimple"
+# Uncomment and configure these variables for IBM Cloud deployment
 project_name = "campfire"        # Name prefix for all resources
 domain_name  = "example.com"     # Your domain name (must be managed by DNSimple)
 subdomain    = "chat"            # Subdomain for the Campfire instance
@@ -29,6 +30,14 @@ subdomain    = "chat"            # Subdomain for the Campfire instance
 # Required for both providers - DNSimple manages DNS records
 dnsimple_token   = "your-dnsimple-api-token"     # Get from: https://dnsimple.com/user
 dnsimple_account = "your-dnsimple-account-id"    # Get from: https://dnsimple.com/account
+
+# =============================================================================
+# CLOUDFLARE CONFIGURATION
+# =============================================================================
+# Only used when dns_provider = "cloudflare"
+# Uncomment and configure these variables for Cloudflare deployment
+# cloudflare_api_token = "your-cloudflare-api-token"   # Get from: https://dash.cloudflare.com/profile/api-tokens
+# cloudflare_zone_id = "your-cloudflare-zone-id"  # Get from: https://dash.cloudflare.com -> Select Domain -> Overview -> API
 
 # =============================================================================
 # SSH CONFIGURATION
